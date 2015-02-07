@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -1496,16 +1496,6 @@ struct GtOCTClassCombatRatingScalarEntry
     float    ratio;
 };
 
-struct GtOCTRegenHPEntry
-{
-    float    ratio;
-};
-
-struct GtOCTRegenMPEntry
-{
-    float    ratio;
-};
-
 struct gtOCTHpPerStaminaEntry
 {
     float    ratio;
@@ -2489,12 +2479,6 @@ struct SpellItemEnchantmentConditionEntry
     //uint8   Logic[5]                                      // 25-30    m_logic[5]
 };
 
-struct StableSlotPricesEntry
-{
-    uint32 Slot;
-    uint32 Price;
-};
-
 struct SummonPropertiesEntry
 {
     uint32  Id;                                             // 0
@@ -2872,6 +2856,6 @@ struct TaxiPathNodePtr
 typedef Path<TaxiPathNodePtr, TaxiPathNodeEntry const> TaxiPathNodeList;
 typedef std::vector<TaxiPathNodeList> TaxiPathNodesByPath;
 
-#define TaxiMaskSize 114
+#define TaxiMaskSize 162
 typedef uint8 TaxiMask[TaxiMaskSize];
 #endif

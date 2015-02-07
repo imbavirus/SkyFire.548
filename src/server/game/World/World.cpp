@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -76,7 +76,11 @@
 #include "ScriptMgr.h"
 #include "WeatherMgr.h"
 #include "CreatureTextMgr.h"
+
+#if USE_SMART_SCRIPTS
 #include "SmartAI.h"
+#endif
+
 #include "Channel.h"
 #include "WardenCheckMgr.h"
 #include "Warden.h"
@@ -1732,8 +1736,10 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Waypoints...");
     sWaypointMgr->Load();
 
+#ifndef USE_SMART_SCRIPTS
     TC_LOG_INFO("server.loading", "Loading SmartAI Waypoints...");
     sSmartWaypointMgr->LoadFromDB();
+#endif
 
     TC_LOG_INFO("server.loading", "Loading Creature Formations...");
     sFormationMgr->LoadCreatureFormations();
@@ -1802,8 +1808,10 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Validating spell scripts...");
     sObjectMgr->ValidateSpellScripts();
 
+#if USE_SMART_SCRIPTS
     TC_LOG_INFO("server.loading", "Loading SmartAI scripts...");
     sSmartScriptMgr->LoadSmartAIFromDB();
+#endif
 
     TC_LOG_INFO("server.loading", "Loading Calendar data...");
     sCalendarMgr->LoadFromDB();

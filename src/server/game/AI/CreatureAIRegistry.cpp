@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -28,8 +28,9 @@
 #include "CreatureAIRegistry.h"
 #include "WaypointMovementGenerator.h"
 #include "CreatureAIFactory.h"
+#if USE_SMART_SCRIPTS
 #include "SmartAI.h"
-
+#endif
 namespace AIRegistry
 {
     void Initialize()
@@ -47,11 +48,13 @@ namespace AIRegistry
         (new CreatureAIFactory<ArcherAI>("ArcherAI"))->RegisterSelf();
         (new CreatureAIFactory<TurretAI>("TurretAI"))->RegisterSelf();
         (new CreatureAIFactory<VehicleAI>("VehicleAI"))->RegisterSelf();
+#if USE_SMART_SCRIPTS
         (new CreatureAIFactory<SmartAI>("SmartAI"))->RegisterSelf();
-
+#endif
         (new GameObjectAIFactory<GameObjectAI>("GameObjectAI"))->RegisterSelf();
+#if USE_SMART_SCRIPTS
         (new GameObjectAIFactory<SmartGameObjectAI>("SmartGameObjectAI"))->RegisterSelf();
-
+#endif
         (new MovementGeneratorFactory<RandomMovementGenerator<Creature> >(RANDOM_MOTION_TYPE))->RegisterSelf();
         (new MovementGeneratorFactory<WaypointMovementGenerator<Creature> >(WAYPOINT_MOTION_TYPE))->RegisterSelf();
     }

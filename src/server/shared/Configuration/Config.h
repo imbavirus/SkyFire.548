@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -26,6 +26,14 @@
 #include <ace/Configuration_Import_Export.h>
 #include <ace/Thread_Mutex.h>
 #include <AutoPtr.h>
+
+#define USE_SYSTEM_CONFIG 1
+
+#if USE_SYSTEM_CONFIG
+#define USE_SMART_SCRIPTS 0
+#else
+#define USE_SMART_SCRIPTS 0
+#endif
 
 typedef Trinity::AutoPtr<ACE_Configuration_Heap, ACE_Null_Mutex> Config;
 

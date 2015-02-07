@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -623,12 +623,28 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
     if (!_player->IsAlive() || _player->IsInCombat())
         return;
 
-    uint64 summonerGuid;
-    bool agree;
-    recvData >> summonerGuid;
-    recvData >> agree;
+    ObjectGuid SummonerGUID;
 
-    _player->SummonIfPossible(agree);
+    SummonerGUID[1] = recvData.ReadBit();
+    SummonerGUID[3] = recvData.ReadBit();
+    SummonerGUID[5] = recvData.ReadBit();
+    SummonerGUID[2] = recvData.ReadBit();
+    bool Accept = recvData.ReadBit();
+    SummonerGUID[7] = recvData.ReadBit();
+    SummonerGUID[0] = recvData.ReadBit();
+    SummonerGUID[4] = recvData.ReadBit();
+    SummonerGUID[6] = recvData.ReadBit();
+
+    recvData.ReadByteSeq(SummonerGUID[0]);
+    recvData.ReadByteSeq(SummonerGUID[1]);
+    recvData.ReadByteSeq(SummonerGUID[6]);
+    recvData.ReadByteSeq(SummonerGUID[3]);
+    recvData.ReadByteSeq(SummonerGUID[5]);
+    recvData.ReadByteSeq(SummonerGUID[4]);
+    recvData.ReadByteSeq(SummonerGUID[2]);
+    recvData.ReadByteSeq(SummonerGUID[7]);
+
+    _player->SummonIfPossible(Accept);
 }
 
 void WorldSession::HandleSetCollisionHeightAck(WorldPacket& recvPacket)

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -624,25 +624,26 @@ void WorldSession::HandleCancelTradeOpcode(WorldPacket& /*recvPacket*/)
 
 void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
 {
+    // sub_6923C2 5.4.8.18291
     ObjectGuid guid;
 
-    guid[1] = recvPacket.ReadBit();
-    guid[2] = recvPacket.ReadBit();
-    guid[4] = recvPacket.ReadBit();
     guid[5] = recvPacket.ReadBit();
+    guid[1] = recvPacket.ReadBit();
+    guid[4] = recvPacket.ReadBit();
+    guid[2] = recvPacket.ReadBit();
     guid[3] = recvPacket.ReadBit();
-    guid[0] = recvPacket.ReadBit();
     guid[7] = recvPacket.ReadBit();
+    guid[0] = recvPacket.ReadBit();
     guid[6] = recvPacket.ReadBit();
 
     recvPacket.ReadByteSeq(guid[4]);
-    recvPacket.ReadByteSeq(guid[1]);
-    recvPacket.ReadByteSeq(guid[5]);
-    recvPacket.ReadByteSeq(guid[7]);
-    recvPacket.ReadByteSeq(guid[3]);
+    recvPacket.ReadByteSeq(guid[6]);
     recvPacket.ReadByteSeq(guid[2]);
     recvPacket.ReadByteSeq(guid[0]);
-    recvPacket.ReadByteSeq(guid[6]);
+    recvPacket.ReadByteSeq(guid[3]);
+    recvPacket.ReadByteSeq(guid[7]);
+    recvPacket.ReadByteSeq(guid[5]);
+    recvPacket.ReadByteSeq(guid[1]);
 
     if (GetPlayer()->m_trade)
         return;

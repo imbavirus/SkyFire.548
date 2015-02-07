@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -913,13 +913,13 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
             const_cast<CreatureTemplate*>(cInfo)->scale = 1.0f;
     }
 
-    if (cInfo->expansion > MAX_CREATURE_BASE_HP)
+    if (cInfo->expansion > CURRENT_CONTENT_EXP)
     {
         TC_LOG_ERROR("sql.sql", "Table `creature_template` lists creature (Entry: %u) with `exp` %u. Ignored and set to 0.", cInfo->Entry, cInfo->expansion);
         const_cast<CreatureTemplate*>(cInfo)->expansion = 0;
     }
 
-    if (cInfo->expansionUnknown > MAX_CREATURE_BASE_HP)
+    if (cInfo->expansionUnknown > CURRENT_CONTENT_EXP)
     {
         TC_LOG_ERROR("sql.sql", "Table `creature_template` lists creature (Entry: %u) with `exp_unk` %u. Ignored and set to 0.", cInfo->Entry, cInfo->expansionUnknown);
         const_cast<CreatureTemplate*>(cInfo)->expansionUnknown = 0;
@@ -3570,13 +3570,8 @@ void ObjectMgr::LoadQuests()
     uint32 oldMSTime = getMSTime();
 
     // For reload case
-    for (QuestMap::const_iterator citrQuest = _questTemplates.begin(); citrQuest != _questTemplates.end(); citrQuest++)
-    {
-        for (QuestObjectiveSet::const_iterator citrObjective = citrQuest->second->m_questObjectives.begin(); citrObjective != citrQuest->second->m_questObjectives.end(); citrObjective++)
-            delete &citrObjective;
-
-        delete citrQuest->second;
-    }
+    for (QuestMap::const_iterator itr = _questTemplates.begin(); itr != _questTemplates.end(); ++itr)
+        delete itr->second;
 
     _questTemplates.clear();
 
@@ -8398,8 +8393,8 @@ CreatureBaseStats const* ObjectMgr::GetCreatureBaseStats(uint8 level, uint8 unit
 void ObjectMgr::LoadCreatureClassLevelStats()
 {
     uint32 oldMSTime = getMSTime();
-    //                                                   0      1        2        3        4        5        6         7         8
-    QueryResult result = WorldDatabase.Query("SELECT level, class, basehp0, basehp1, basehp2, basehp3, basehp4, basemana, basearmor FROM creature_classlevelstats");
+    //                                                 0      1           2                   3                7         8
+    QueryResult result = WorldDatabase.Query("SELECT level, class, OldContentBaseHP, CurrentContentBaseHP, basemana, basearmor FROM creature_classlevelstats");
 
     if (!result)
     {
@@ -8420,8 +8415,8 @@ void ObjectMgr::LoadCreatureClassLevelStats()
         for (uint8 i = 0; i < MAX_CREATURE_BASE_HP; ++i)
             stats.BaseHealth[i] = fields[i + 2].GetUInt32();
 
-        stats.BaseMana = fields[6].GetUInt32();
-        stats.BaseArmor = fields[7].GetUInt32();
+        stats.BaseMana = fields[4].GetUInt32();
+        stats.BaseArmor = fields[5].GetUInt32();
 
         if (!Class || ((1 << (Class - 1)) & CLASSMASK_ALL_CREATURES) == 0)
             TC_LOG_ERROR("sql.sql", "Creature base stats for level %u has invalid class %u", Level, Class);

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -74,8 +74,6 @@ char const GtChanceToSpellCritBasefmt[] = "xf";
 char const GtChanceToSpellCritfmt[] = "xf";
 char const GtNPCManaCostScalerfmt[] = "xf";
 char const GtOCTClassCombatRatingScalarfmt[] = "df";
-char const GtOCTRegenHPfmt[] = "f";
-//char const GtOCTRegenMPfmt[] = "f";
 char const GtRegenMPPerSptfmt[] = "xf";
 char const GtSpellScalingfmt[] = "df";
 char const GtOCTBaseHPByClassfmt[] = "df";
@@ -161,7 +159,6 @@ char const SpellLevelsEntryfmt[] = "dxxiii";
 char const SpellRuneCostfmt[] = "niiixi";
 char const SpellShapeshiftEntryfmt[] = "nixixx";
 char const SpellShapeshiftFormfmt[] = "nxxiixiiixxiiiiiiiixx";
-char const StableSlotPricesfmt[] = "ni";
 char const SummonPropertiesfmt[] = "niiiii";
 char const TalentEntryfmt[] = "nxiiixxxixx";
 char const TaxiNodesEntryfmt[] = "nifffsiixixx";

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -681,7 +681,7 @@ enum EquipmentSlots                                         // 19 slots
     EQUIPMENT_SLOT_BACK         = 14,
     EQUIPMENT_SLOT_MAINHAND     = 15,
     EQUIPMENT_SLOT_OFFHAND      = 16,
-    EQUIPMENT_SLOT_RANGED       = 17,
+    //EQUIPMENT_SLOT_RANGED       = 17,
     EQUIPMENT_SLOT_TABARD       = 18,
     EQUIPMENT_SLOT_END          = 19
 };

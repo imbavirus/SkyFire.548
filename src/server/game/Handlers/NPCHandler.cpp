@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -500,14 +500,30 @@ void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
 {
     TC_LOG_DEBUG("network", "WORLD: CMSG_SPIRIT_HEALER_ACTIVATE");
 
-    uint64 guid;
+    ObjectGuid UnitGUID;
 
-    recvData >> guid;
+    UnitGUID[2] = recvData.ReadBit();
+    UnitGUID[7] = recvData.ReadBit();
+    UnitGUID[6] = recvData.ReadBit();
+    UnitGUID[0] = recvData.ReadBit();
+    UnitGUID[5] = recvData.ReadBit();
+    UnitGUID[4] = recvData.ReadBit();
+    UnitGUID[1] = recvData.ReadBit();
+    UnitGUID[3] = recvData.ReadBit();
 
-    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_SPIRITHEALER);
+    recvData.ReadByteSeq(UnitGUID[1]);
+    recvData.ReadByteSeq(UnitGUID[5]);
+    recvData.ReadByteSeq(UnitGUID[6]);
+    recvData.ReadByteSeq(UnitGUID[3]);
+    recvData.ReadByteSeq(UnitGUID[2]);
+    recvData.ReadByteSeq(UnitGUID[0]);
+    recvData.ReadByteSeq(UnitGUID[7]);
+    recvData.ReadByteSeq(UnitGUID[4]);
+
+    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(UnitGUID, UNIT_NPC_FLAG_SPIRITHEALER);
     if (!unit)
     {
-        TC_LOG_DEBUG("network", "WORLD: HandleSpiritHealerActivateOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
+        TC_LOG_DEBUG("network", "WORLD: HandleSpiritHealerActivateOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(UnitGUID)));
         return;
     }
 

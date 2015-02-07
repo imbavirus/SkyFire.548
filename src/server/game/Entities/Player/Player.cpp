@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -8500,9 +8500,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
 
     WeaponAttackType attType = BASE_ATTACK;
 
-    if (slot == EQUIPMENT_SLOT_RANGED && (
-        proto->InventoryType == INVTYPE_RANGED || proto->InventoryType == INVTYPE_THROWN ||
-        proto->InventoryType == INVTYPE_RANGEDRIGHT))
+    if (slot == EQUIPMENT_SLOT_MAINHAND && proto->IsRangedInventoryType())
     {
         attType = RANGED_ATTACK;
     }
@@ -8520,9 +8518,7 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
     WeaponAttackType attType = BASE_ATTACK;
     float damage = 0.0f;
 
-    if (slot == EQUIPMENT_SLOT_RANGED && (
-        proto->InventoryType == INVTYPE_RANGED || proto->InventoryType == INVTYPE_THROWN ||
-        proto->InventoryType == INVTYPE_RANGEDRIGHT))
+    if (slot == EQUIPMENT_SLOT_MAINHAND && proto->IsRangedInventoryType())
     {
         attType = RANGED_ATTACK;
     }
@@ -8562,7 +8558,7 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
 
     if (proto->Delay && !IsInFeralForm())
     {
-        if (slot == EQUIPMENT_SLOT_RANGED)
+        if (slot == EQUIPMENT_SLOT_MAINHAND && proto->IsRangedInventoryType())
             SetAttackTime(RANGED_ATTACK, apply ? proto->Delay: BASE_ATTACK_TIME);
         else if (slot == EQUIPMENT_SLOT_MAINHAND)
             SetAttackTime(BASE_ATTACK, apply ? proto->Delay: BASE_ATTACK_TIME);
@@ -8765,9 +8761,12 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                         EquipmentSlots slot;
                         switch (attType)
                         {
-                            case BASE_ATTACK:   slot = EQUIPMENT_SLOT_MAINHAND; break;
-                            case OFF_ATTACK:    slot = EQUIPMENT_SLOT_OFFHAND;  break;
-                            case RANGED_ATTACK: slot = EQUIPMENT_SLOT_RANGED;   break;
+                            case RANGED_ATTACK:
+                            case BASE_ATTACK:
+                                slot = EQUIPMENT_SLOT_MAINHAND; break;
+                            case OFF_ATTACK:
+                                slot = EQUIPMENT_SLOT_OFFHAND;  break;
+                            
                             default: slot = EQUIPMENT_SLOT_END; break;
                         }
                         if (slot != i)
@@ -10732,9 +10731,14 @@ Item* Player::GetWeaponForAttack(WeaponAttackType attackType, bool useable /*= f
     uint8 slot;
     switch (attackType)
     {
-        case BASE_ATTACK:   slot = EQUIPMENT_SLOT_MAINHAND; break;
-        case OFF_ATTACK:    slot = EQUIPMENT_SLOT_OFFHAND;  break;
-        case RANGED_ATTACK: slot = EQUIPMENT_SLOT_RANGED;   break;
+        case RANGED_ATTACK:
+        case BASE_ATTACK:
+            slot = EQUIPMENT_SLOT_MAINHAND;
+            break;
+        case OFF_ATTACK:
+            slot = EQUIPMENT_SLOT_OFFHAND;
+            break;
+         
         default: return NULL;
     }
 
@@ -10780,7 +10784,6 @@ uint8 Player::GetAttackBySlot(uint8 slot)
     {
         case EQUIPMENT_SLOT_MAINHAND: return BASE_ATTACK;
         case EQUIPMENT_SLOT_OFFHAND:  return OFF_ATTACK;
-        case EQUIPMENT_SLOT_RANGED:   return RANGED_ATTACK;
         default:                      return MAX_ATTACK;
     }
 }
@@ -12594,7 +12597,6 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         {
             case EQUIPMENT_SLOT_MAINHAND:
             case EQUIPMENT_SLOT_OFFHAND:
-            case EQUIPMENT_SLOT_RANGED:
                 RecalculateRating(CR_ARMOR_PENETRATION);
             default:
                 break;
@@ -12757,7 +12759,6 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                     {
                         case EQUIPMENT_SLOT_MAINHAND:
                         case EQUIPMENT_SLOT_OFFHAND:
-                        case EQUIPMENT_SLOT_RANGED:
                             RecalculateRating(CR_ARMOR_PENETRATION);
                         default:
                             break;
@@ -12886,7 +12887,6 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
                 {
                     case EQUIPMENT_SLOT_MAINHAND:
                     case EQUIPMENT_SLOT_OFFHAND:
-                    case EQUIPMENT_SLOT_RANGED:
                         RecalculateRating(CR_ARMOR_PENETRATION);
                     default:
                         break;
@@ -14414,7 +14414,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                         HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_VALUE, float(enchant_amount), apply);
                     else if (item->GetSlot() == EQUIPMENT_SLOT_OFFHAND)
                         HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_VALUE, float(enchant_amount), apply);
-                    else if (item->GetSlot() == EQUIPMENT_SLOT_RANGED)
+                    else if (item->GetSlot() == EQUIPMENT_SLOT_MAINHAND)
                         HandleStatModifier(UNIT_MOD_DAMAGE_RANGED, TOTAL_VALUE, float(enchant_amount), apply);
                     break;
                 case ITEM_ENCHANTMENT_TYPE_EQUIP_SPELL:
@@ -20877,8 +20877,26 @@ void Player::SendAttackSwingBadFacingAttack()
 
 void Player::SendAutoRepeatCancel(Unit* target)
 {
-    WorldPacket data(SMSG_CANCEL_AUTO_REPEAT, target->GetPackGUID().size());
-    data.append(target->GetPackGUID());                     // may be it's target guid
+    WorldPacket data(SMSG_CANCEL_AUTO_REPEAT, 8);
+    ObjectGuid Guid = target->GetGUID();
+
+    data.WriteBit(Guid[1]);
+    data.WriteBit(Guid[3]);
+    data.WriteBit(Guid[0]);
+    data.WriteBit(Guid[4]);
+    data.WriteBit(Guid[6]);
+    data.WriteBit(Guid[7]);
+    data.WriteBit(Guid[5]);
+    data.WriteBit(Guid[2]);
+
+    data.WriteByteSeq(Guid[7]);
+    data.WriteByteSeq(Guid[6]);
+    data.WriteByteSeq(Guid[2]);
+    data.WriteByteSeq(Guid[5]);
+    data.WriteByteSeq(Guid[0]);
+    data.WriteByteSeq(Guid[4]);
+    data.WriteByteSeq(Guid[1]);
+    data.WriteByteSeq(Guid[3]);
     GetSession()->SendPacket(&data);
 }
 
@@ -23560,6 +23578,7 @@ template void Player::UpdateVisibilityOf(Creature*      target, UpdateData& data
 template void Player::UpdateVisibilityOf(Corpse*        target, UpdateData& data, std::set<Unit*>& visibleNow);
 template void Player::UpdateVisibilityOf(GameObject*    target, UpdateData& data, std::set<Unit*>& visibleNow);
 template void Player::UpdateVisibilityOf(DynamicObject* target, UpdateData& data, std::set<Unit*>& visibleNow);
+template void Player::UpdateVisibilityOf(AreaTrigger*   target, UpdateData& data, std::set<Unit*>& visibleNow);
 
 void Player::UpdateObjectVisibility(bool forced)
 {
@@ -24781,9 +24800,9 @@ bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item cons
                     return true;
 
             // ranged slot can have some armor subclasses
-            if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
+            /*if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
                 if (item != ignoreItem && item->IsFitToSpellRequirements(spellInfo))
-                    return true;
+                    return true;*/
 
             break;
         }
@@ -27544,7 +27563,7 @@ float Player::GetAverageItemLevel()
     for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
         // don't check tabard, ranged, offhand or shirt
-        if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_RANGED || i == EQUIPMENT_SLOT_OFFHAND || i == EQUIPMENT_SLOT_BODY)
+        if (i == EQUIPMENT_SLOT_TABARD || /*i == EQUIPMENT_SLOT_RANGED ||*/ i == EQUIPMENT_SLOT_OFFHAND || i == EQUIPMENT_SLOT_BODY)
             continue;
 
         if (m_items[i] && m_items[i]->GetTemplate())

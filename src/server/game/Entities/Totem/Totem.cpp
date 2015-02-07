@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -60,11 +60,30 @@ void Totem::InitStats(uint32 duration)
             && m_Properties->Slot >= SUMMON_SLOT_TOTEM
             && m_Properties->Slot < MAX_TOTEM_SLOT)
     {
-        WorldPacket data(SMSG_TOTEM_CREATED, 1 + 8 + 4 + 4);
-        data << uint8(m_Properties->Slot - 1);
-        data << uint64(GetGUID());
+        WorldPacket data(SMSG_TOTEM_CREATED, 17);
+        ObjectGuid TotemGUID = GetGUID();
+
+        data.WriteBit(TotemGUID[6]);
+        data.WriteBit(TotemGUID[1]);
+        data.WriteBit(TotemGUID[2]);
+        data.WriteBit(TotemGUID[5]);
+        data.WriteBit(TotemGUID[3]);
+        data.WriteBit(TotemGUID[4]);
+        data.WriteBit(TotemGUID[7]);
+        data.WriteBit(TotemGUID[0]);
+
         data << uint32(duration);
         data << uint32(GetUInt32Value(UNIT_FIELD_CREATED_BY_SPELL));
+        data.WriteByteSeq(TotemGUID[3]);
+        data.WriteByteSeq(TotemGUID[4]);
+        data.WriteByteSeq(TotemGUID[5]);
+        data.WriteByteSeq(TotemGUID[6]);
+        data.WriteByteSeq(TotemGUID[0]);
+        data.WriteByteSeq(TotemGUID[2]);
+        data << uint8(m_Properties->Slot - 1);
+        data.WriteByteSeq(TotemGUID[1]);
+        data.WriteByteSeq(TotemGUID[7]);
+
         GetOwner()->ToPlayer()->SendDirectMessage(&data);
 
         // set display id depending on caster's race

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -757,23 +757,23 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
     recvData >> text_emote;
     recvData >> emoteNum;
 
-guid[6] = recvData.ReadBit();
-guid[7] = recvData.ReadBit();
-guid[3] = recvData.ReadBit();
-guid[2] = recvData.ReadBit();
-guid[0] = recvData.ReadBit();
-guid[5] = recvData.ReadBit();
-guid[1] = recvData.ReadBit();
-guid[4] = recvData.ReadBit();
+	guid[6] = recvData.ReadBit();
+	guid[7] = recvData.ReadBit();
+	guid[3] = recvData.ReadBit();
+	guid[2] = recvData.ReadBit();
+	guid[0] = recvData.ReadBit();
+	guid[5] = recvData.ReadBit();
+	guid[1] = recvData.ReadBit();
+	guid[4] = recvData.ReadBit();
 
-recvData.ReadByteSeq(guid[0]);
-recvData.ReadByteSeq(guid[5]);
-recvData.ReadByteSeq(guid[1]);
-recvData.ReadByteSeq(guid[4]);
-recvData.ReadByteSeq(guid[2]);
-recvData.ReadByteSeq(guid[3]);
-recvData.ReadByteSeq(guid[7]);
-recvData.ReadByteSeq(guid[6]);
+	recvData.ReadByteSeq(guid[0]);
+	recvData.ReadByteSeq(guid[5]);
+	recvData.ReadByteSeq(guid[1]);
+	recvData.ReadByteSeq(guid[4]);
+	recvData.ReadByteSeq(guid[2]);
+	recvData.ReadByteSeq(guid[3]);
+	recvData.ReadByteSeq(guid[7]);
+	recvData.ReadByteSeq(guid[6]);
 
     sScriptMgr->OnPlayerTextEmote(GetPlayer(), text_emote, emoteNum, guid);
 

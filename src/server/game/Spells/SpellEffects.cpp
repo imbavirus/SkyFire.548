@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -338,10 +338,46 @@ void Spell::EffectInstaKill(SpellEffIndex /*effIndex*/)
     if (m_caster == unitTarget)                              // prevent interrupt message
         finish();
 
-    WorldPacket data(SMSG_SPELLINSTAKILLLOG, 8+8+4);
-    data << uint64(m_caster->GetGUID());
-    data << uint64(unitTarget->GetGUID());
-    data << uint32(m_spellInfo->Id);
+    ObjectGuid targetguid = unitTarget->GetGUID();
+    ObjectGuid casterguid = m_caster->GetGUID();
+
+    WorldPacket data(SMSG_SPELLINSTAKILLLOG, 8 + 8 + 4);
+
+    data.WriteBit(casterguid[6]);
+    data.WriteBit(targetguid[0]);
+    data.WriteBit(casterguid[7]);
+    data.WriteBit(targetguid[2]);
+    data.WriteBit(casterguid[3]);
+    data.WriteBit(casterguid[1]);
+    data.WriteBit(casterguid[2]);
+    data.WriteBit(casterguid[0]);
+    data.WriteBit(casterguid[4]);
+    data.WriteBit(targetguid[4]);
+    data.WriteBit(targetguid[7]);
+    data.WriteBit(targetguid[1]);
+    data.WriteBit(targetguid[6]);
+    data.WriteBit(targetguid[5]);
+    data.WriteBit(casterguid[5]);
+    data.WriteBit(targetguid[3]);
+
+    data.WriteByteSeq(casterguid[0]);
+    data.WriteByteSeq(targetguid[1]);
+    data.WriteByteSeq(casterguid[3]);
+    data.WriteByteSeq(casterguid[4]);
+    data.WriteByteSeq(casterguid[5]);
+    data.WriteByteSeq(casterguid[7]);
+    data.WriteByteSeq(targetguid[0]);
+    data.WriteByteSeq(casterguid[6]);
+    data.WriteByteSeq(targetguid[2]);
+    data.WriteByteSeq(targetguid[4]);
+    data.WriteByteSeq(casterguid[1]);
+    data << int32(m_spellInfo->Id);
+    data.WriteByteSeq(targetguid[3]);
+    data.WriteByteSeq(casterguid[2]);
+    data.WriteByteSeq(targetguid[7]);
+    data.WriteByteSeq(targetguid[6]);
+    data.WriteByteSeq(targetguid[5]);
+
     m_caster->SendMessageToSet(&data, true);
 
     m_caster->DealDamage(unitTarget, unitTarget->GetHealth(), NULL, NODAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
@@ -4163,9 +4199,27 @@ void Spell::EffectSummonPlayer(SpellEffIndex /*effIndex*/)
     unitTarget->ToPlayer()->SetSummonPoint(m_caster->GetMapId(), x, y, z);
 
     WorldPacket data(SMSG_SUMMON_REQUEST, 8+4+4);
-    data << uint64(m_caster->GetGUID());                    // summoner guid
+    ObjectGuid SummonerGUID = m_caster->GetGUID();
+
+    data.WriteBit(SummonerGUID[0]);
+    data.WriteBit(SummonerGUID[6]);
+    data.WriteBit(SummonerGUID[3]);
+    data.WriteBit(SummonerGUID[2]);
+    data.WriteBit(SummonerGUID[1]);
+    data.WriteBit(SummonerGUID[4]);
+    data.WriteBit(SummonerGUID[7]);
+    data.WriteBit(SummonerGUID[5]);
+
+    data.WriteByteSeq(SummonerGUID[4]);
     data << uint32(m_caster->GetZoneId());                  // summoner zone
+    data.WriteByteSeq(SummonerGUID[7]);
+    data.WriteByteSeq(SummonerGUID[3]);
+    data.WriteByteSeq(SummonerGUID[1]);
     data << uint32(MAX_PLAYER_SUMMON_DELAY*IN_MILLISECONDS); // auto decline after msecs
+    data.WriteByteSeq(SummonerGUID[2]);
+    data.WriteByteSeq(SummonerGUID[6]);
+    data.WriteByteSeq(SummonerGUID[5]);
+    data.WriteByteSeq(SummonerGUID[0]);
     unitTarget->ToPlayer()->GetSession()->SendPacket(&data);
 }
 
@@ -4573,7 +4627,26 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
         return;
 
     WorldPacket data(SMSG_CLEAR_TARGET, 8);
-    data << uint64(m_caster->GetGUID());
+    ObjectGuid CasterGUID = m_caster->GetGUID();
+
+    data.WriteBit(CasterGUID[6]);
+    data.WriteBit(CasterGUID[2]);
+    data.WriteBit(CasterGUID[0]);
+    data.WriteBit(CasterGUID[4]);
+    data.WriteBit(CasterGUID[7]);
+    data.WriteBit(CasterGUID[1]);
+    data.WriteBit(CasterGUID[3]);
+    data.WriteBit(CasterGUID[5]);
+
+    data.WriteByteSeq(CasterGUID[4]);
+    data.WriteByteSeq(CasterGUID[0]);
+    data.WriteByteSeq(CasterGUID[3]);
+    data.WriteByteSeq(CasterGUID[5]);
+    data.WriteByteSeq(CasterGUID[2]);
+    data.WriteByteSeq(CasterGUID[7]);
+    data.WriteByteSeq(CasterGUID[6]);
+    data.WriteByteSeq(CasterGUID[1]);
+
     m_caster->SendMessageToSet(&data, true);
 }
 

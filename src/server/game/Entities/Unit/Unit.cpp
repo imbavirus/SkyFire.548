@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -13603,12 +13603,10 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, SpellInfo const
         if (spellProto->EquippedItemClass == ITEM_CLASS_WEAPON)
         {
             Item* item = NULL;
-            if (attType == BASE_ATTACK)
+            if (attType == BASE_ATTACK || attType == RANGED_ATTACK)
                 item = player->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
             else if (attType == OFF_ATTACK)
                 item = player->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-            else
-                item = player->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
 
             if (player->IsInFeralForm())
                 return false;
@@ -16132,7 +16130,26 @@ void Unit::SendClearThreatListOpcode()
 {
     TC_LOG_DEBUG("entities.unit", "WORLD: Send SMSG_THREAT_CLEAR Message");
     WorldPacket data(SMSG_THREAT_CLEAR, 8);
-    data.append(GetPackGUID());
+    ObjectGuid UnitGUID = GetGUID();
+
+    data.WriteBit(UnitGUID[6]);
+    data.WriteBit(UnitGUID[7]);
+    data.WriteBit(UnitGUID[4]);
+    data.WriteBit(UnitGUID[5]);
+    data.WriteBit(UnitGUID[2]);
+    data.WriteBit(UnitGUID[1]);
+    data.WriteBit(UnitGUID[0]);
+    data.WriteBit(UnitGUID[3]);
+
+    data.WriteByteSeq(UnitGUID[7]);
+    data.WriteByteSeq(UnitGUID[0]);
+    data.WriteByteSeq(UnitGUID[4]);
+    data.WriteByteSeq(UnitGUID[3]);
+    data.WriteByteSeq(UnitGUID[2]);
+    data.WriteByteSeq(UnitGUID[1]);
+    data.WriteByteSeq(UnitGUID[6]);
+    data.WriteByteSeq(UnitGUID[5]);
+
     SendMessageToSet(&data, false);
 }
 
@@ -16264,8 +16281,26 @@ uint32 Unit::GetRemainingPeriodicAmount(uint64 caster, uint32 spellId, AuraType 
 
 void Unit::SendClearTarget()
 {
-    WorldPacket data(SMSG_BREAK_TARGET, GetPackGUID().size());
-    data.append(GetPackGUID());
+    WorldPacket data(SMSG_BREAK_TARGET, 8);
+    ObjectGuid UnitGUID = GetGUID();
+
+    data.WriteBit(UnitGUID[2]);
+    data.WriteBit(UnitGUID[3]);
+    data.WriteBit(UnitGUID[7]);
+    data.WriteBit(UnitGUID[5]);
+    data.WriteBit(UnitGUID[4]);
+    data.WriteBit(UnitGUID[6]);
+    data.WriteBit(UnitGUID[0]);
+    data.WriteBit(UnitGUID[1]);
+
+    data.WriteByteSeq(UnitGUID[2]);
+    data.WriteByteSeq(UnitGUID[1]);
+    data.WriteByteSeq(UnitGUID[3]);
+    data.WriteByteSeq(UnitGUID[0]);
+    data.WriteByteSeq(UnitGUID[7]);
+    data.WriteByteSeq(UnitGUID[4]);
+    data.WriteByteSeq(UnitGUID[6]);
+    data.WriteByteSeq(UnitGUID[5]);
     SendMessageToSet(&data, false);
 }
 
@@ -16559,28 +16594,28 @@ bool Unit::SetHover(bool enable, bool packetOnly /*= false*/)
     return true;
 }
 
-void Unit::SendSetPlayHoverAnim(bool enable)
+void Unit::SendSetPlayHoverAnim(bool PlayHoverAnim)
 {
-    ObjectGuid guid = GetGUID();
+    ObjectGuid UnitGUID = GetGUID();
     WorldPacket data(SMSG_SET_PLAY_HOVER_ANIM, 10);
-    data.WriteBit(guid[4]);
-    data.WriteBit(guid[0]);
-    data.WriteBit(guid[1]);
-    data.WriteBit(enable);
-    data.WriteBit(guid[3]);
-    data.WriteBit(guid[7]);
-    data.WriteBit(guid[5]);
-    data.WriteBit(guid[2]);
-    data.WriteBit(guid[6]);
+    data.WriteBit(UnitGUID[3]);
+    data.WriteBit(UnitGUID[6]);
+    data.WriteBit(UnitGUID[1]);
+    data.WriteBit(UnitGUID[4]);
+    data.WriteBit(UnitGUID[5]);
+    data.WriteBit(UnitGUID[0]);
+    data.WriteBit(PlayHoverAnim);
+    data.WriteBit(UnitGUID[2]);
+    data.WriteBit(UnitGUID[7]);
 
-    data.WriteByteSeq(guid[3]);
-    data.WriteByteSeq(guid[2]);
-    data.WriteByteSeq(guid[1]);
-    data.WriteByteSeq(guid[7]);
-    data.WriteByteSeq(guid[0]);
-    data.WriteByteSeq(guid[5]);
-    data.WriteByteSeq(guid[4]);
-    data.WriteByteSeq(guid[6]);
+    data.WriteByteSeq(UnitGUID[5]);
+    data.WriteByteSeq(UnitGUID[1]);
+    data.WriteByteSeq(UnitGUID[6]);
+    data.WriteByteSeq(UnitGUID[2]);
+    data.WriteByteSeq(UnitGUID[3]);
+    data.WriteByteSeq(UnitGUID[0]);
+    data.WriteByteSeq(UnitGUID[4]);
+    data.WriteByteSeq(UnitGUID[7]);
 
     SendMessageToSet(&data, true);
 }

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2011-2014 Project SkyFire <http://www.projectskyfire.org/>
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2014 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2011-2015 Project SkyFire <http://www.projectskyfire.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2015 MaNGOS <http://getmangos.com/>
  * Copyright (C) 2006-2014 ScriptDev2 <https://github.com/scriptdev2/scriptdev2/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -710,7 +710,7 @@ class instance_ulduar : public InstanceMapScript
                             Map::PlayerList const& players = instance->GetPlayers();
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                                 if (Player* player = itr->GetSource())
-                                    for (uint8 slot = EQUIPMENT_SLOT_MAINHAND; slot <= EQUIPMENT_SLOT_RANGED; ++slot)
+                                    for (uint8 slot = EQUIPMENT_SLOT_MAINHAND; slot <= EQUIPMENT_SLOT_OFFHAND; ++slot)
                                         if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
                                             if (item->GetTemplate()->ItemLevel > _maxWeaponItemLevel)
                                                 _maxWeaponItemLevel = item->GetTemplate()->ItemLevel;
@@ -730,7 +730,7 @@ class instance_ulduar : public InstanceMapScript
 
                                         if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
                                         {
-                                            if (slot >= EQUIPMENT_SLOT_MAINHAND && slot <= EQUIPMENT_SLOT_RANGED)
+                                            if (slot >= EQUIPMENT_SLOT_MAINHAND && slot <= EQUIPMENT_SLOT_OFFHAND)
                                             {
                                                 if (item->GetTemplate()->ItemLevel > _maxWeaponItemLevel)
                                                     _maxWeaponItemLevel = item->GetTemplate()->ItemLevel;
