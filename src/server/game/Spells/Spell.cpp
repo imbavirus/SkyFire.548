@@ -510,8 +510,8 @@ SpellValue::SpellValue(SpellInfo const* proto)
 
 Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags, uint64 originalCasterGUID, bool skipCheck) :
 m_spellInfo(sSpellMgr->GetSpellForDifficultyFromSpell(info, caster)),
-m_caster((info->AttributesEx6 & SPELL_ATTR6_CAST_BY_CHARMER && caster->GetCharmerOrOwner()) ? caster->GetCharmerOrOwner() : caster)
-, m_spellValue(new SpellValue(m_spellInfo)), m_preGeneratedPath(PathGenerator(m_caster))
+m_caster((info->AttributesEx6 & SPELL_ATTR6_CAST_BY_CHARMER && caster->GetCharmerOrOwner()) ? caster->GetCharmerOrOwner() : caster),
+m_spellValue(new SpellValue(m_spellInfo)), m_preGeneratedPath(PathGenerator(m_caster))
 {
     m_customError = SPELL_CUSTOM_ERROR_NONE;
     m_skipCheck = skipCheck;
@@ -1608,8 +1608,8 @@ void Spell::SelectImplicitChainTargets(SpellEffIndex effIndex, SpellImplicitTarg
         m_applyMultiplierMask |= effMask;
 
         std::list<WorldObject*> targets;
-        SearchChainTargets(targets, maxTargets - 1, target, targetType.GetObjectType(), targetType.GetCheckType()
-            , m_spellInfo->Effects[effIndex].ImplicitTargetConditions, targetType.GetTarget() == TARGET_UNIT_TARGET_CHAINHEAL_ALLY);
+        SearchChainTargets(targets, maxTargets - 1, target, targetType.GetObjectType(), targetType.GetCheckType(),
+            m_spellInfo->Effects[effIndex].ImplicitTargetConditions, targetType.GetTarget() == TARGET_UNIT_TARGET_CHAINHEAL_ALLY);
 
         // Chain primary target is added earlier
         CallScriptObjectAreaTargetSelectHandlers(targets, effIndex);
@@ -4711,35 +4711,195 @@ void Spell::SendSpellGo()
 void Spell::SendLogExecute()
 {
     ObjectGuid guid = m_caster->GetGUID();
-
-    // TODO: Finish me
-    WorldPacket data(SMSG_SPELLLOGEXECUTE, (8+4+4+4+4+8));
-    /*
-    data.WriteBit(0);
-    data.WriteBit(guid[6]);
-    data.WriteBits(0, 19); // Count
-    data.WriteBit(guid[1]);
-    data.WriteBit(guid[4]);
-    data.WriteBit(guid[7]);
-    data.WriteBit(guid[5]);
+    //TODO finish this !
+    WorldPacket data(SMSG_SPELL_LOG_EXECUTE, (8 + 4 + 4 + 4 + 4 + 8));
     data.WriteBit(guid[0]);
+    data.WriteBit(guid[6]);
+    data.WriteBit(guid[5]);
+    data.WriteBit(guid[7]);
     data.WriteBit(guid[2]);
+    data.WriteBits(0, 19);
+    data.WriteBit(guid[4]);
+
+    /*if (EffectCount) //28
+    {
+        data << uint32(0);// unk
+
+        if (ExtraAttacksTargetsCount) //20
+        {
+            ObjectGuid VictimGuid;
+            data.WriteBit(VictimGuid[5]);
+            data.WriteBit(VictimGuid[4]);
+            data.WriteBit(VictimGuid[2]);
+            data.WriteBit(VictimGuid[3]);
+            data.WriteBit(VictimGuid[1]);
+            data.WriteBit(VictimGuid[0]);
+            data.WriteBit(VictimGuid[6]);
+            data.WriteBit(VictimGuid[7]);
+        }
+
+        data << uint32(0);// unk
+
+        if (PowerDrainTargetsCount) //4
+        {
+            ObjectGuid VictimGuid;
+            data.WriteBit(VictimGuid[0]);
+            data.WriteBit(VictimGuid[3]);
+            data.WriteBit(VictimGuid[1]);
+            data.WriteBit(VictimGuid[5]);
+            data.WriteBit(VictimGuid[6]);
+            data.WriteBit(VictimGuid[4]);
+            data.WriteBit(VictimGuid[7]);
+            data.WriteBit(VictimGuid[2]);
+        }
+
+        data << uint32(0);// unk
+        data << uint32(0);// unk
+        data << uint32(0);// unk
+
+        if (DurabilityDamageTargetsCount) //36
+        {
+            ObjectGuid VictimGuid;
+            data.WriteBit(VictimGuid[7]);
+            data.WriteBit(VictimGuid[2]);
+            data.WriteBit(VictimGuid[0]);
+            data.WriteBit(VictimGuid[5]);
+            data.WriteBit(VictimGuid[6]);
+            data.WriteBit(VictimGuid[3]);
+            data.WriteBit(VictimGuid[4]);
+            data.WriteBit(VictimGuid[1]);
+        }
+
+        data << uint32(0);// unk
+
+        if (GenericVictimTargetsCount) //52
+        {
+            ObjectGuid VictimGuid;
+            data.WriteBit(VictimGuid[6]);
+            data.WriteBit(VictimGuid[5]);
+            data.WriteBit(VictimGuid[1]);
+            data.WriteBit(VictimGuid[0]);
+            data.WriteBit(VictimGuid[3]);
+            data.WriteBit(VictimGuid[4]);
+            data.WriteBit(VictimGuid[7]);
+            data.WriteBit(VictimGuid[2]);
+        }
+    }*/
+
+    data.WriteBit(guid[1]);
     data.WriteBit(guid[3]);
+    data.WriteBit(0);
+    /*
+    if ( v31 )
+    {
+    	sub_70FED7(v32);// unk
+    }
 
+    if (72)
+    {
+        if (56)
+        {
+            data << uint32(0);// unk
+            data << uint32(0);// unk
+        }
+
+        data << uint32(0);// unk
+        data << uint32(0);// unk
+        data << uint32(0);// unk
+    }
+
+    if (EffectCount) //28
+    {
+        if (GenericVictimTargetsCount) //52
+        {
+            ObjectGuid VictimGuid;
+            data.WriteByteSeq(VictimGuid[7]);
+            data.WriteByteSeq(VictimGuid[5]);
+            data.WriteByteSeq(VictimGuid[1]);
+            data.WriteByteSeq(VictimGuid[2]);
+            data.WriteByteSeq(VictimGuid[6]);
+            data.WriteByteSeq(VictimGuid[4]);
+            data.WriteByteSeq(VictimGuid[0]);
+            data.WriteByteSeq(VictimGuid[3]);
+        }
+
+        if (DurabilityDamageTargetsCount) //36
+        {
+            ObjectGuid VictimGuid;
+            data.WriteByteSeq(VictimGuid[4]);
+            data.WriteByteSeq(VictimGuid[3]);
+
+            data << uint32(0);// ItemID
+
+            data.WriteByteSeq(VictimGuid[6]);
+            data.WriteByteSeq(VictimGuid[5]);
+            data.WriteByteSeq(VictimGuid[0]);
+            data.WriteByteSeq(VictimGuid[7]);
+
+             data << uint32(0);// Amount
+
+            data.WriteByteSeq(VictimGuid[2]);
+            data.WriteByteSeq(VictimGuid[1]);
+        }
+
+        if (PowerDrainTargetsCount) //4
+        {
+            ObjectGuid VictimGuid;
+            data.WriteByteSeq(VictimGuid[3]);
+            data.WriteByteSeq(VictimGuid[7]);
+            data.WriteByteSeq(VictimGuid[5]);
+            data.WriteByteSeq(VictimGuid[2]);
+            data.WriteByteSeq(VictimGuid[0]);
+
+            data << uint32(0);// Points
+            data << uint32(0);// PowerType
+
+            data.WriteByteSeq(VictimGuid[4]);
+            data.WriteByteSeq(VictimGuid[1]);
+
+             data << float(0);// Amplitude
+
+            data.WriteByteSeq(guid[6]);
+        }
+
+        if (ExtraAttacksTargetsCount) //20
+        {
+            ObjectGuid VictimGuid;
+            data.WriteByteSeq(VictimGuid[0]);
+            data.WriteByteSeq(VictimGuid[6]);
+            data.WriteByteSeq(VictimGuid[4]);
+            data.WriteByteSeq(VictimGuid[7]);
+            data.WriteByteSeq(VictimGuid[2]);
+            data.WriteByteSeq(VictimGuid[5]);
+            data.WriteByteSeq(VictimGuid[3]);
+
+            data << uint32(0);// NumAttacks
+
+            data.WriteByteSeq(VictimGuid[1]);
+        }
+
+        //if (84)
+        {
+            data << uint32(0);
+        }
+
+        data << uint32(0);
+
+        //if ( *(v36 + *(v3 + 32) + 68) )
+        {
+            data << uint32(0);
+        }
+    }*/
+
+    data << uint32(m_spellInfo->Id);
     data.WriteByteSeq(guid[5]);
-    data.WriteByteSeq(guid[2]);
-    data.WriteByteSeq(guid[1]);
-    data.WriteByteSeq(guid[3]);
-    data.WriteByteSeq(guid[0]);
     data.WriteByteSeq(guid[7]);
-    data << uint32(m_spellInfo->Id);
+    data.WriteByteSeq(guid[1]);
     data.WriteByteSeq(guid[6]);
+    data.WriteByteSeq(guid[2]);
+    data.WriteByteSeq(guid[0]);
     data.WriteByteSeq(guid[4]);
-    */
-
-    data.append(m_caster->GetPackGUID());
-
-    data << uint32(m_spellInfo->Id);
+    data.WriteByteSeq(guid[3]);
 
     uint8 effCount = 0;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -4764,6 +4924,7 @@ void Spell::SendLogExecute()
         delete m_effectExecuteData[i];
         m_effectExecuteData[i] = NULL;
     }
+
     m_caster->SendMessageToSet(&data, true);
 }
 
@@ -4994,17 +5155,34 @@ void Spell::SendResurrectRequest(Player* target)
                                ? ""
                                : m_caster->GetNameForLocaleIdx(target->GetSession()->GetSessionDbLocaleIndex()));
 
+    ObjectGuid Guid = m_caster->GetGUID();
     WorldPacket data(SMSG_RESURRECT_REQUEST, (8+4+sentName.size()+1+1+1+4));
-    data << uint64(m_caster->GetGUID());
+
     data << uint32(sentName.size() + 1);
-
-    data << sentName;
-    data << uint8(0); // null terminator
-
-    data << uint8(m_caster->GetTypeId() == TYPEID_PLAYER ? 0 : 1); // "you'll be afflicted with resurrection sickness"
-    // override delay sent with SMSG_CORPSE_RECLAIM_DELAY, set instant resurrection for spells with this attribute
-    // 4.2.2 edit : id of the spell used to resurect. (used client-side for Mass Resurect)
     data << uint32(m_spellInfo->Id);
+    data << uint32(0); // unknown
+
+    data.WriteBit(Guid[3]);
+    data << uint8(0); // null terminator
+    data << uint8(m_caster->GetTypeId() == TYPEID_PLAYER ? 0 : 1); // "you'll be afflicted with resurrection sickness"
+    data.WriteBit(Guid[1]);
+    data.WriteBit(Guid[5]);
+    data.WriteBit(Guid[2]);
+    data.WriteBit(Guid[6]);
+    data.WriteBit(Guid[0]);
+    data.WriteBit(Guid[4]);
+    data.WriteBit(Guid[7]);
+
+    data.WriteByteSeq(Guid[7]);
+    data.WriteByteSeq(Guid[3]);
+    data.WriteByteSeq(Guid[5]);
+    data << sentName;
+    data.WriteByteSeq(Guid[2]);
+    data.WriteByteSeq(Guid[4]);
+    data.WriteByteSeq(Guid[1]);
+    data.WriteByteSeq(Guid[6]);
+    data.WriteByteSeq(Guid[0]);
+
     target->GetSession()->SendPacket(&data);
 }
 
@@ -7162,13 +7340,13 @@ void Spell::UpdatePointers()
 CurrentSpellTypes Spell::GetCurrentContainer() const
 {
     if (IsNextMeleeSwingSpell())
-        return(CURRENT_MELEE_SPELL);
+        return (CURRENT_MELEE_SPELL);
     else if (IsAutoRepeat())
-        return(CURRENT_AUTOREPEAT_SPELL);
+        return (CURRENT_AUTOREPEAT_SPELL);
     else if (m_spellInfo->IsChanneled())
-        return(CURRENT_CHANNELED_SPELL);
+        return (CURRENT_CHANNELED_SPELL);
     else
-        return(CURRENT_GENERIC_SPELL);
+        return (CURRENT_GENERIC_SPELL);
 }
 
 bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
