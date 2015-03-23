@@ -38,7 +38,7 @@ before_script:
   - cd cmake-3.2.1
   - ./configure --prefix=/opt/cmake
   - make -j16
-  - make install
+  - sudo make install
 
 script:
   - mkdir build
