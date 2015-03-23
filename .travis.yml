@@ -23,15 +23,17 @@ compiler:
   - clang
 
 before_install:
-  - echo "yes" | sudo add-apt-repository ppa:kalakris/cmake
   - echo "yes" | sudo add-apt-repository ppa:ubuntu-toolchain-r/test
   - sudo apt-get -qq update
   - sudo apt-get -qq install libace-dev
   - sudo apt-get -qq install libncurses5-dev
-  - sudo apt-get -qq install build-essential autoconf libtool gcc-4.8 g++-4.8 make cmake openssl
+  - sudo apt-get -qq install build-essential autoconf libtool gcc-4.8 g++-4.8 make openssl
   - sudo apt-get -qq install libssl-dev mysql-server mysql-client libmysqlclient15-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev
-  
-script:
+  - wget http://www.cmake.org/files/v3.2/cmake-3.2.1-Linux-i386.tar.gz
+  - tar -xzf cmake-3.2.1-Linux-i386.tar.gz
+  - sudo cp -fR cmake-3.2.1-Linux-i386/* /usr
+
+ script:
   - mkdir build
   - cd build
   - cmake ../ -DSCRIPTS=1 -DTOOLS=1
