@@ -25,7 +25,6 @@ compiler:
 before_install:
   - echo "yes" | sudo add-apt-repository ppa:kalakris/cmake
   - echo "yes" | sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-  - sudo apt-get remove cmake
   - sudo apt-get update
   - sudo apt-get install libace-dev
   - sudo apt-get install libncurses5-dev
@@ -41,6 +40,7 @@ before_script:
   - sudo make install
 
 script:
+  - cd ProjectSkyfire/SkyFire.548
   - mkdir build
   - cd build
   - cmake ../ -DSCRIPTS=1 -DTOOLS=1
