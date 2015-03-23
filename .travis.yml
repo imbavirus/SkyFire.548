@@ -40,7 +40,7 @@ before_script:
   - sudo make install
 
 script:
-  - cd ProjectSkyfire/SkyFire.548
+  - cd /home/travis/build/ProjectSkyfire/SkyFire.548/
   - mkdir build
   - cd build
   - cmake ../ -DSCRIPTS=1 -DTOOLS=1
