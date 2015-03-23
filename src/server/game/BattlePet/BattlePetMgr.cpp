@@ -40,7 +40,10 @@ BattlePetMgr::~BattlePetMgr()
 void BattlePetMgr::LoadFromDb(PreparedQueryResult result)
 {
     if (!result)
+    {
+        TC_LOG_ERROR("server.loading", ">> Loaded 0 battle pets. DB table `account_battle_pet` is empty.");
         return;
+    }
 
     do
     {
@@ -159,8 +162,10 @@ void BattlePetMgr::SaveToDb(SQLTransaction& trans)
 void BattlePetMgr::LoadSlotsFromDb(PreparedQueryResult result)
 {
     if (!result)
+    {
+        TC_LOG_ERROR("server.loading", ">> Loaded 0 battle pet slots. DB table `account_battle_pet_slot` is empty.");
         return;
-
+    }
     Field* fields = result->Fetch();
 
     uint64 slot1   = fields[0].GetUInt64();
