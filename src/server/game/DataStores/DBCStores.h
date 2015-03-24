@@ -21,6 +21,7 @@
 #define TRINITY_DBCSTORES_H
 
 #include "Common.h"
+#include "UnorderedMap.h"
 #include "DBCStore.h"
 #include "DBCStructure.h"
 
