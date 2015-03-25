@@ -1252,11 +1252,7 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     bool ret = AddMember(m_leaderGuid, GR_GUILDMASTER);                  // Add guildmaster
 
     if (ret)
-    {
-        _BroadcastEvent(GE_FOUNDER, 0);
         sScriptMgr->OnGuildCreate(this, pLeader, name);
-    }
-
     return ret;
 }
 
@@ -1266,7 +1262,6 @@ void Guild::Disband()
     // Call scripts before guild data removed from database
     sScriptMgr->OnGuildDisband(this);
 
-    _BroadcastEvent(GE_DISBANDED, 0);
     // Remove all members
     while (!m_members.empty())
     {
@@ -1620,7 +1615,7 @@ void Guild::HandleSetMOTD(WorldSession* session, std::string const& motd)
         stmt->setUInt32(1, m_id);
         CharacterDatabase.Execute(stmt);
 
-        _BroadcastEvent(GE_MOTD, 0, motd.c_str());
+        SendGuildMOTD(session);
     }
 }
 
@@ -2394,35 +2389,20 @@ void Guild::SendLoginInfo(WorldSession* session)
 
     /*
         Login sequence:
-          SMSG_GUILD_EVENT - GE_MOTD
-          SMSG_GUILD_RANK
-          SMSG_GUILD_EVENT - GE_SIGNED_ON
-          -- learn perks
-          SMSG_GUILD_REPUTATION_WEEKLY_CAP
-          SMSG_GUILD_ACHIEVEMENT_DATA
-          SMSG_GUILD_MEMBER_DAILY_RESET // bank withdrawal reset
+        SMSG_GUILD_EVENT_MOTD
+        SMSG_GUILD_RANK
+        SMSG_GUILD_EVENT - GE_SIGNED_ON
+        -- learn perks
+        SMSG_GUILD_REPUTATION_WEEKLY_CAP
+        SMSG_GUILD_ACHIEVEMENT_DATA
+        SMSG_GUILD_MEMBER_DAILY_RESET // bank withdrawal reset
     */
 
-    WorldPacket data(SMSG_GUILD_EVENT, 1 + 1 + m_motd.size() + 1);
-    data << uint8(GE_MOTD);
-    data << uint8(1);
-    data << m_motd;
-    session->SendPacket(&data);
-
-    TC_LOG_DEBUG("guild", "SMSG_GUILD_EVENT [%s] MOTD", session->GetPlayerInfo().c_str());
-
+    SendGuildMOTD(session);
     SendGuildRankInfo(session);
     _BroadcastEvent(GE_SIGNED_ON, player->GetGUID(), player->GetName().c_str());
 
-    // Send to self separately, player is not in world yet and is not found by _BroadcastEvent
-    data.Initialize(SMSG_GUILD_EVENT, 1 + 1 + player->GetName().size() + 8);
-    data << uint8(GE_SIGNED_ON);
-    data << uint8(1);
-    data << player->GetName();
-    data << uint64(player->GetGUID());
-    session->SendPacket(&data);
-
-    data.Initialize(SMSG_GUILD_MEMBER_DAILY_RESET, 0);  // tells the client to request bank withdrawal limit
+    WorldPacket data(SMSG_GUILD_MEMBER_DAILY_RESET, 0);  // tells the client to request bank withdrawal limit
     session->SendPacket(&data);
 
     if (!sWorld->getBoolConfig(CONFIG_GUILD_LEVELING_ENABLED))
@@ -3772,4 +3752,18 @@ void Guild::HandleSetBankTabNote(WorldSession* session, uint32 tabId, std::strin
     WorldPacket data(SMSG_GUILD_EVENT_BANK_TAB_TEXT_CHANGED, 4);
     data << tabId;
     BroadcastPacket(&data);
+}
+
+void Guild::SendGuildMOTD(WorldSession* session /* = NULL */) const
+{
+    WorldPacket data(SMSG_GUILD_EVENT_MOTD);
+    data.WriteBits(m_motd.size(), 10);
+    data.FlushBits();
+
+    if (m_motd.size() > 0)
+        data.append(m_motd.c_str(), m_motd.size());
+
+    BroadcastPacket(&data);
+
+    TC_LOG_DEBUG("guild", "WORLD::Sent SMSG_GUILD_EVENT_MOTD");
 }

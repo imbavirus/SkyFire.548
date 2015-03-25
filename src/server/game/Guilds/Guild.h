@@ -811,6 +811,7 @@ public:
     void SendBankLog(WorldSession* session, uint8 tabId) const;
     void SendBankList(WorldSession* session, uint8 tabId, bool withContent, bool withTabInfo) const;
     void SendGuildXP(WorldSession* session = NULL) const;
+    void SendGuildMOTD(WorldSession* session = NULL) const;
     void SendBankTabText(WorldSession* session, uint8 tabId) const;
     void SendPermissions(WorldSession* session) const;
     void SendMoneyInfo(WorldSession* session) const;
