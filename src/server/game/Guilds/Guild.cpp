@@ -2101,9 +2101,15 @@ void Guild::HandleAddNewRank(WorldSession* session, std::string const& name)
         return;
 
     // Only leader can add new rank
-    if (_IsLeader(session->GetPlayer()))
-        if (_CreateRank(name, GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK))
-            _BroadcastEvent(GE_RANK_CREATED, 0);
+    if (!_IsLeader(session->GetPlayer()))
+        SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_PERMISSIONS);
+    else
+    {
+        _CreateRank(name, GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
+        HandleQuery(session);
+        HandleRoster();
+        SendGuildRankInfo(session);
+    }
 }
 
 void Guild::HandleRemoveRank(WorldSession* session, uint8 rankId)
@@ -2112,20 +2118,28 @@ void Guild::HandleRemoveRank(WorldSession* session, uint8 rankId)
     if (_GetRanksSize() <= GUILD_RANKS_MIN_COUNT || rankId >= _GetRanksSize() || !_IsLeader(session->GetPlayer()))
         return;
 
-    // Delete bank rights for rank
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_BANK_RIGHTS_FOR_RANK);
-    stmt->setUInt32(0, m_id);
-    stmt->setUInt8(1, rankId);
-    CharacterDatabase.Execute(stmt);
-    // Delete rank
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_RANK);
-    stmt->setUInt32(0, m_id);
-    stmt->setUInt8(1, rankId);
-    CharacterDatabase.Execute(stmt);
+    // Only leader can delete ranks
+    if (!_IsLeader(session->GetPlayer()))
+        SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_PERMISSIONS);
+    else
+    {
+        // Delete bank rights for rank
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_BANK_RIGHTS_FOR_RANK);
+        stmt->setUInt32(0, m_id);
+        stmt->setUInt8(1, rankId);
+        CharacterDatabase.Execute(stmt);
+        // Delete rank
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_RANK);
+        stmt->setUInt32(0, m_id);
+        stmt->setUInt8(1, rankId);
+        CharacterDatabase.Execute(stmt);
 
-    m_ranks.erase(m_ranks.begin() + rankId);
+        m_ranks.erase(m_ranks.begin() + rankId);
 
-    _BroadcastEvent(GE_RANK_DELETED, rankId);
+        HandleQuery(session);
+        HandleRoster();
+        SendGuildRankInfo(session);
+    }
 }
 
 void Guild::HandleMemberDepositMoney(WorldSession* session, uint64 amount, bool cashFlow /*=false*/)
