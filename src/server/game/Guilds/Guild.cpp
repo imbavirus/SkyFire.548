@@ -2107,6 +2107,40 @@ void Guild::HandleAddNewRank(WorldSession* session, std::string const& name)
     }
 }
 
+void Guild::HandleUpdateRank(WorldSession* session, uint32 GuildID, bool RankId)
+{
+    // Only leader can update rank
+    if (!_IsLeader(session->GetPlayer()))
+        SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_PERMISSIONS);
+    else
+    {
+        // update rank
+        RankInfo* RankInfo1 = NULL;
+        RankInfo* RankInfo2 = NULL;
+        uint32 GuildId = GuildID - (-1 + 2 * uint8(RankId));
+        for (uint32 i = 0; i < m_ranks.size(); ++i)
+        {
+            if (m_ranks[i].GetId() == GuildID)
+                RankInfo1 = &m_ranks[i];
+            if (m_ranks[i].GetId() == GuildId)
+                RankInfo2 = &m_ranks[i];
+        }
+        if (!RankInfo1 || !RankInfo2)
+            return;
+
+        RankInfo tmp = NULL;
+        tmp = *RankInfo2;
+        RankInfo2->SetName(RankInfo1->GetName());
+        RankInfo2->SetRights(RankInfo1->GetRights());
+        RankInfo1->SetName(tmp.GetName());
+        RankInfo1->SetRights(tmp.GetRights());
+        
+        HandleQuery(session);
+        HandleRoster();
+        SendGuildRankInfo(session);
+    }
+}
+
 void Guild::HandleRemoveRank(WorldSession* session, uint8 rankId)
 {
     // Cannot remove rank if total count is minimum allowed by the client or is not leader
