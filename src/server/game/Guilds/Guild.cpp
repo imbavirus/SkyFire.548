@@ -1481,6 +1481,78 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
     }
 }
 
+void Guild::SendUpdateRoster(WorldSession* session /*= NULL*/)
+{
+    ByteBuffer memberData(100);
+    // Guess size
+
+    WorldPacket data(SMSG_GUILD_UPDATE_ROSTER, 100);
+
+    data.WriteBits(m_members.size(), 17);
+
+    for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+    {
+        Member* member = itr->second;
+        size_t pubNoteLength = member->GetPublicNote().length();
+        size_t offNoteLength = member->GetOfficerNote().length();
+        ObjectGuid guid = member->GetGUID();
+
+        data.WriteBit(guid[5]);
+        data.WriteBits(pubNoteLength, 8);
+        data.WriteBit(guid[1]);
+        data.WriteBits(offNoteLength, 8);
+        data.WriteBits(member->GetName().length(), 6);
+        data.WriteBit(0);
+        data.WriteBit(guid[6]);
+        data.WriteBit(guid[7]);
+        data.WriteBit(guid[4]);
+        data.WriteBit(0);
+        data.WriteBit(guid[0]);
+        data.WriteBit(guid[3]);
+        data.WriteBit(guid[2]);
+
+        // for (2 professions)
+        memberData << uint32(0) << uint32(0) << uint32(0);
+        memberData << uint32(0) << uint32(0) << uint32(0);
+
+        data.WriteByteSeq(guid[2]);
+        data << float(member->IsOnline() ? 0.0f : float(::time(NULL) - member->GetLogoutTime()) / DAY);
+        data << uint32(member->GetTotalReputation());
+        data.WriteByteSeq(guid[0]);
+        data << uint32(member->GetZoneId());
+        data << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP) - member->GetWeekReputation());
+        data << uint32(member->GetRankId());
+        data.WriteByteSeq(guid[4]);
+        data.WriteByteSeq(guid[6]);
+        data << uint32(realmID);
+        data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[7]);
+        data << uint32(member->GetAchievementPoints());
+        data << uint64(member->GetTotalActivity());
+        data.WriteByteSeq(guid[3]);
+        data << uint8(0);        // Gender	  
+        data.WriteString(member->GetOfficerNote());
+        data.WriteString(member->GetPublicNote());
+        data << uint8(member->GetFlags());
+        data.WriteString(member->GetName());
+        data << uint8(member->GetClass());
+        data << uint64(member->GetWeekActivity());
+        data.WriteByteSeq(guid[5]);
+        data << uint8(member->GetLevel());
+    }
+
+    if (session)
+    {
+        TC_LOG_DEBUG("guild", "SMSG_GUILD_UPDATE_ROSTER [%s]", session->GetPlayerInfo().c_str());
+        session->SendPacket(&data);
+    }
+    else
+    {
+        TC_LOG_DEBUG("guild", "SMSG_GUILD_UPDATE_ROSTER [Broadcast]");
+        BroadcastPacket(&data);
+    }
+}
+
 void Guild::HandleQuery(WorldSession* session)
 {
     ObjectGuid guid = GetGUID();
@@ -1672,7 +1744,8 @@ void Guild::HandleSetNewGuildMaster(WorldSession* session, std::string const& na
         {
             _SetLeaderGUID(newGuildMaster);
             oldGuildMaster->ChangeRank(GR_INITIATE);
-            _BroadcastEvent(GE_LEADER_CHANGED, 0, player->GetName().c_str(), name.c_str());
+
+            SendUpdateRoster();
         }
     }
 }

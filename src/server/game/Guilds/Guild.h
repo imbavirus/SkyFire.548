@@ -818,6 +818,7 @@ public:
     void SendMoneyInfo(WorldSession* session) const;
     void SendLoginInfo(WorldSession* session);
     void SendNewsUpdate(WorldSession* session);
+    void SendUpdateRoster(WorldSession* session = NULL);
 
     // Load from DB
     bool LoadFromDB(Field* fields);
