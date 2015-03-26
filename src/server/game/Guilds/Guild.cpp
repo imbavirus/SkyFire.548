@@ -1483,9 +1483,6 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 
 void Guild::SendUpdateRoster(WorldSession* session /*= NULL*/)
 {
-    ByteBuffer memberData(100);
-    // Guess size
-
     WorldPacket data(SMSG_GUILD_UPDATE_ROSTER, 100);
 
     data.WriteBits(m_members.size(), 17);
@@ -1512,8 +1509,8 @@ void Guild::SendUpdateRoster(WorldSession* session /*= NULL*/)
         data.WriteBit(guid[2]);
 
         // for (2 professions)
-        memberData << uint32(0) << uint32(0) << uint32(0);
-        memberData << uint32(0) << uint32(0) << uint32(0);
+        data << uint32(0) << uint32(0) << uint32(0);
+        data << uint32(0) << uint32(0) << uint32(0);
 
         data.WriteByteSeq(guid[2]);
         data << float(member->IsOnline() ? 0.0f : float(::time(NULL) - member->GetLogoutTime()) / DAY);
