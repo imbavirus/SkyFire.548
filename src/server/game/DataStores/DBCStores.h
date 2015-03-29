@@ -23,8 +23,7 @@
 #include "Common.h"
 #include "DBCStore.h"
 #include "DBCStructure.h"
-
-#include <list>
+#include "SharedDefines.h"
 
 typedef std::map<uint32, uint32> SpecializationOverrideSpellsMap;
 

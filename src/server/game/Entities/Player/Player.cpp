@@ -26141,7 +26141,7 @@ void Player::_LoadSkills(PreparedQueryResult result)
 
     uint32 count = 0;
     uint8 professionCount = 0;
-    std::std::unordered_map<uint32, uint32> loadedSkillValues;
+    std::unordered_map<uint32, uint32> loadedSkillValues;
     if (result)
     {
         do

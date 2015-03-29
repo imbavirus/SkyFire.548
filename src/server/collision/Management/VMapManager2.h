@@ -20,10 +20,10 @@
 #ifndef _VMAPMANAGER2_H
 #define _VMAPMANAGER2_H
 
-#include "IVMapManager.h"
 #include "Define.h"
-#include <ace/Thread_Mutex.h>
+#include "IVMapManager.h"
 #include <unordered_map>
+#include <ace/Thread_Mutex.h>
 
 //===========================================================
 
