@@ -24,10 +24,11 @@
 #include "Appender.h"
 #include "LogWorker.h"
 #include "Logger.h"
-#include "Dynamic/UnorderedMap.h"
 
 #include <string>
 #include <ace/Singleton.h>
+
+#include <unordered_map>
 
 #define LOGGER_ROOT "root"
 

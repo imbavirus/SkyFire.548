@@ -21,8 +21,8 @@
 #define TRINITY_OBJECTREGISTRY_H
 
 #include "Define.h"
-#include "Dynamic/UnorderedMap.h"
 #include <ace/Singleton.h>
+#include <unordered_map>
 
 #include <string>
 #include <vector>

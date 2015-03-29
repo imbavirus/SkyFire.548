@@ -21,9 +21,9 @@
 #define _VMAPMANAGER2_H
 
 #include "IVMapManager.h"
-#include "Dynamic/UnorderedMap.h"
 #include "Define.h"
 #include <ace/Thread_Mutex.h>
+#include <unordered_map>
 
 //===========================================================
 

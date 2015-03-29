@@ -18,6 +18,7 @@ branches:
   only:
     - master
     - scan
+	- cplusplus11
 
 compiler:
   - clang
