@@ -107,6 +107,6 @@ class Appender
         AppenderFlags flags;
 };
 
-typedef UNORDERED_MAP<uint8, Appender*> AppenderMap;
+typedef std::unordered_map<uint8, Appender*> AppenderMap;
 
 #endif

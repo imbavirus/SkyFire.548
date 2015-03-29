@@ -36,7 +36,7 @@ class Log
 {
     friend class ACE_Singleton<Log, ACE_Thread_Mutex>;
 
-    typedef UNORDERED_MAP<std::string, Logger> LoggerMap;
+    typedef std::unordered_map<std::string, Logger> LoggerMap;
 
     private:
         Log();
