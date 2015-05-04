@@ -150,11 +150,15 @@ public:
             if (strncmp(paramStr, "player", limit) == 0)
                 sWorld->SetPlayerSecurityLimit(SEC_PLAYER);
             else if (strncmp(paramStr, "moderator", limit) == 0)
-                sWorld->SetPlayerSecurityLimit(SEC_MODERATOR);
+                sWorld->SetPlayerSecurityLimit(SEC_TRIAL_GM);
             else if (strncmp(paramStr, "gamemaster", limit) == 0)
                 sWorld->SetPlayerSecurityLimit(SEC_GAMEMASTER);
+			else if (strncmp(paramStr, "administrator", limit) == 0)
+				sWorld->SetPlayerSecurityLimit(SEC_HEADOFSTAFF);
             else if (strncmp(paramStr, "administrator", limit) == 0)
                 sWorld->SetPlayerSecurityLimit(SEC_ADMINISTRATOR);
+			else if (strncmp(paramStr, "administrator", limit) == 0)
+				sWorld->SetPlayerSecurityLimit(SEC_OWNER);
             else if (strncmp(paramStr, "reset", limit) == 0)
             {
                 sWorld->SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 100));
@@ -178,15 +182,21 @@ public:
             case SEC_PLAYER:
                 secName = "Player";
                 break;
-            case SEC_MODERATOR:
-                secName = "Moderator";
+            case SEC_TRIAL_GM:
+                secName = "Trial GM";
                 break;
             case SEC_GAMEMASTER:
                 secName = "Gamemaster";
                 break;
+			case SEC_HEADOFSTAFF:
+				secName = "Head of Staff";
+				break;
             case SEC_ADMINISTRATOR:
                 secName = "Administrator";
                 break;
+			case SEC_OWNER:
+				secName = "Owner";
+				break;
             default:
                 secName = "<unknown>";
                 break;
